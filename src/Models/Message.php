@@ -23,6 +23,11 @@ class Message extends BaseModel
         'participation_id',
         'type',
         'data',
+        'is_edited',
+        'is_forwarded',
+        'is_pinned',
+        'reply_to_id',
+        'attachments',
     ];
 
     protected $table = ConfigurationManager::MESSAGES_TABLE;
@@ -43,6 +48,11 @@ class Message extends BaseModel
         'flagged'      => 'boolean',
         'data'         => 'array',
         'is_encrypted' => 'boolean',
+        'is_edited'    => 'boolean',
+        'is_forwarded' => 'boolean',
+        'is_pinned'    => 'boolean',
+        'attachments'  => 'array',
+        'reply_to_id'  => 'integer',
     ];
 
     protected $appends = ['sender'];
@@ -50,6 +60,11 @@ class Message extends BaseModel
     public function participation()
     {
         return $this->belongsTo(Participation::class, 'participation_id');
+    }
+
+    public function replyTo()
+    {
+        return $this->belongsTo(Message::class, 'reply_to_id');
     }
 
     /**

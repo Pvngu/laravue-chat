@@ -58,20 +58,28 @@ class ChatServiceProvider extends ServiceProvider
      */
     public function publishMigrations()
     {
-        $timestamp = date('Y_m_d_His', time());
-        $stub      = __DIR__ . '/../database/migrations/create_chat_tables.php';
-        $target    = $this->app->databasePath() . '/migrations/' . $timestamp . '_create_chat_tables.php';
+        // $timestamp = date('Y_m_d_His', time());
+        $stub = __DIR__ . '/../database/migrations/create_chat_tables.php';
+        $target = $this->app->databasePath() . '/migrations/' . date('Y_m_d_His', time()) . '_create_chat_tables.php';
 
-        $encryptionStub   = __DIR__ . '/../database/migrations/add_is_encrypted_to_messages_table.php';
-        $encryptionTarget = $this->app->databasePath() . '/migrations/' . $timestamp . '_add_is_encrypted_to_messages_table.php';
+        $encryptionStub = __DIR__ . '/../database/migrations/add_is_encrypted_to_messages_table.php';
+        $encryptionTarget = $this->app->databasePath() . '/migrations/' . date('Y_m_d_His', time() + 100) . '_add_is_encrypted_to_messages_table.php';
 
-        $reactionsStub   = __DIR__ . '/../database/migrations/add_reactions_to_messages.php';
-        $reactionsTarget = $this->app->databasePath() . '/migrations/' . $timestamp . '_add_reactions_to_messages.php';
+        $reactionsStub = __DIR__ . '/../database/migrations/add_reactions_to_messages.php';
+        $reactionsTarget = $this->app->databasePath() . '/migrations/' . date('Y_m_d_His', time() + 200) . '_add_reactions_to_messages.php';
+
+        $reactionStub = __DIR__ . '/../database/migrations/add_name_to_conversations_table.php';
+        $reactionTarget = $this->app->databasePath() . '/migrations/' . date('Y_m_d_His', time() + 300) . '_add_name_to_conversations_table.php';
+
+        $apiFieldsStub = __DIR__ . '/../database/migrations/add_api_fields_to_chat_tables.php';
+        $apiFieldsTarget = $this->app->databasePath() . '/migrations/' . date('Y_m_d_His', time() + 400) . '_add_api_fields_to_chat_tables.php';
 
         $this->publishes([
-            $stub           => $target,
+            $stub => $target,
             $encryptionStub => $encryptionTarget,
-            $reactionsStub  => $reactionsTarget,
+            $reactionsStub => $reactionsTarget,
+            $reactionStub => $reactionTarget,
+            $apiFieldsStub => $apiFieldsTarget,
         ], 'chat.migrations');
     }
 
