@@ -5,7 +5,7 @@ $middleware = config('musonza_chat.routes.middleware');
 
 Route::group([
     'middleware' => $middleware,
-    'namespace' => 'Musonza\Chat\Http\Controllers',
+    'namespace' => 'Musonza\Chat\Http\Controllers\Api',
     'prefix' => $chatRoutesPrefix,
 ], function () {
     // Conversations
