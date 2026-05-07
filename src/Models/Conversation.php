@@ -389,41 +389,43 @@ class Conversation extends BaseModel
     private function getConversationsList(Model $participant, $options)
     {
         /** @var Builder $paginator */
-        $paginator = $participant->participation()
-            ->join($this->tablePrefix . 'conversations as c', $this->tablePrefix . 'participation.conversation_id', '=', 'c.id')
+        $paginator = self::query()
+            ->join($this->tablePrefix . 'participation as p', 'p.conversation_id', '=', $this->tablePrefix . 'conversations.id')
+            ->where('p.messageable_type', $participant->getMorphClass())
+            ->where('p.messageable_id', $participant->getKey())
             ->with([
-                'conversation.last_message' => function ($query) use ($participant) {
+                'last_message' => function ($query) use ($participant) {
                     $query->join($this->tablePrefix . 'message_notifications', $this->tablePrefix . 'message_notifications.message_id', '=', $this->tablePrefix . 'messages.id')
                         ->select($this->tablePrefix . 'message_notifications.*', $this->tablePrefix . 'messages.*')
                         ->where($this->tablePrefix . 'message_notifications.messageable_id', $participant->getKey())
                         ->where($this->tablePrefix . 'message_notifications.messageable_type', $participant->getMorphClass())
                         ->whereNull($this->tablePrefix . 'message_notifications.deleted_at');
                 },
-                'conversation.participants.messageable',
+                'participants.messageable',
             ]);
 
         if (isset($options['filters']['private'])) {
-            $paginator = $paginator->where('c.private', (bool) $options['filters']['private']);
+            $paginator = $paginator->where($this->tablePrefix . 'conversations.private', (bool) $options['filters']['private']);
         }
 
         if (isset($options['filters']['direct_message'])) {
-            $paginator = $paginator->where('c.direct_message', (bool) $options['filters']['direct_message']);
+            $paginator = $paginator->where($this->tablePrefix . 'conversations.direct_message', (bool) $options['filters']['direct_message']);
         }
 
         if (isset($options['filters']['name'])) {
-            $paginator = $paginator->where('c.name', $options['filters']['name']);
+            $paginator = $paginator->where($this->tablePrefix . 'conversations.name', $options['filters']['name']);
         }
 
-        $total = $paginator->distinct('c.id')->toBase()->getCountForPagination();
+        $total = $paginator->distinct($this->tablePrefix . 'conversations.id')->toBase()->getCountForPagination();
 
         $sorting = $options['sorting'] ?? 'DESC';
 
         $paginator = $paginator
-            ->orderBy('c.updated_at', $sorting)
-            ->orderBy('c.id', $sorting)
-            ->distinct('c.updated_at', 'c.id');
+            ->orderBy($this->tablePrefix . 'conversations.updated_at', $sorting)
+            ->orderBy($this->tablePrefix . 'conversations.id', $sorting)
+            ->distinct($this->tablePrefix . 'conversations.updated_at', $this->tablePrefix . 'conversations.id');
 
-        return $paginator->paginate($options['perPage'], [$this->tablePrefix . 'participation.*', 'c.*'], $options['pageName'], $options['page'], $total);
+        return $paginator->paginate($options['perPage'], [$this->tablePrefix . 'conversations.*', 'p.is_pinned', 'p.is_favorited', 'p.is_archived', 'p.settings'], $options['pageName'], $options['page'], $total);
     }
 
     /**
