@@ -13,6 +13,7 @@ class Participation extends BaseModel
 
     protected $table = ConfigurationManager::PARTICIPATION_TABLE;
 
+    protected $fillable = [
         'conversation_id',
         'settings',
         'is_pinned',
@@ -21,10 +22,10 @@ class Participation extends BaseModel
     ];
 
     protected $casts = [
-        'settings'     => 'array',
-        'is_pinned'    => 'boolean',
+        'settings' => 'array',
+        'is_pinned' => 'boolean',
         'is_favorited' => 'boolean',
-        'is_archived'  => 'boolean',
+        'is_archived' => 'boolean',
     ];
 
     /**
